@@ -121,6 +121,37 @@
 								<input class="form-control" placeholder="11/29A, Đình Phong Phú" id = "address" name="address" type="text" value = "${myaccount.address }">
 							</div>
 							
+							<div>
+								<c:choose>
+									<c:when test="${status_update_account_email==0 }">
+										<div class="alert alert-warning" role="alert">Email không hợp lệ</div>
+									</c:when>
+									<c:when test="${status_update_account_email==2 }">
+										<div class="alert alert-warning" role="alert">Email đã được sử dụng cho tài khoản khác</div>
+									</c:when>
+									<c:when test="${status_update_account_phone==0 }">
+										<div class="alert alert-warning" role="alert">Số điện thoại không hợp lệ</div>
+									</c:when>
+									<c:when test="${status_update_account_phone==2 }">
+										<div class="alert alert-warning" role="alert">Số điện thoại đã được sử dụng cho tài khoản khác</div>
+									</c:when>
+									<c:when test="${status_update_account_name==0 }">
+										<div class="alert alert-warning" role="alert">Họ và tên không hợp lệ</div>
+									</c:when>
+									<c:when test="${status_update_account_address==0 }">
+										<div class="alert alert-warning" role="alert">Địa chỉ không hợp lệ</div>
+									</c:when>
+									<c:when test="${status_update_account==0 }">
+										<div class="alert alert-warning" role="alert">Cập nhật thất bại</div>
+									</c:when>
+									<c:when test="${status_update_account==1 }">
+										<div class="alert alert-success" role="alert">Cập nhật thành công</div>
+									</c:when>
+									<c:otherwise>
+									</c:otherwise>
+								</c:choose>
+							</div>
+							
 							<button type="submit" class="btn btn-primary">Save</button>
 							<a class="btn btn-warning" href = "${pageContext.servletContext.contextPath}/admin/changepass.htm">Đổi mật khẩu</a>
 						</fieldset>

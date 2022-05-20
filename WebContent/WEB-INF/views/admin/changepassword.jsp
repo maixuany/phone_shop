@@ -111,6 +111,26 @@
 								<input class="form-control" placeholder="*******************" id = "rePassword" name="rePassword" type="password">
 							</div>
 							
+							<div>
+						  <c:choose>
+								<c:when test="${status_update_Pass==0}">
+									<div class="alert alert-warning" role="alert">Mật khẩu không hợp lệ</div>
+								</c:when>
+								<c:when test="${status_update_Pass==-1}">
+									<div class="alert alert-warning" role="alert">Mật khẩu không đúng</div>
+								</c:when>
+								<c:when test="${status_update_Pass==-2}">
+									<div class="alert alert-warning" role="alert">Mật khẩu không khớp</div>
+								</c:when>
+								<c:when test="${status_update_Pass==1}">
+									<div class="alert alert-success" role="alert">Đổi mật khẩu thành công</div>
+								</c:when>
+								<c:otherwise>
+
+								</c:otherwise>
+						</c:choose>
+						  </div>
+							
 							<button type="submit" class="btn btn-primary">Save</button>
 						</fieldset>
 					</form>

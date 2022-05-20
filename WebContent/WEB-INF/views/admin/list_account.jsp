@@ -91,6 +91,22 @@
 			<div class="col-lg-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">Danh Sách Tài Khoản</div>
+					<div>
+					<c:choose>
+						<c:when test="${status_add_account==1}">
+							<div class="alert alert-success" role="alert">Thêm tài khoản thành công</div>
+							${status_add_account=null}
+						</c:when>
+									
+						<c:when test="${status_add_account==0}">
+							<div class="alert alert-warning" role="alert">Thêm tài khoản thất bại</div>
+							${status_add_account=null}
+						</c:when>
+						<c:otherwise>
+
+						</c:otherwise>
+					</c:choose>
+					</div>
 					<div class="panel-body">
 						<div class="panel panel-info " style="margin-bottom: 15px">
 						  <div class="panel-body">

@@ -1,6 +1,7 @@
 package ptithcm.controller.admin;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -44,12 +45,25 @@ public class Product_Ad {
 		return "admin/add_batch";
 	}
 
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value= "newproduct", method = RequestMethod.POST)
 	public String addProduct(ModelMap model,@RequestParam("batchName") String batchName, 
 			@RequestParam("category") Integer categoryId,
 			@RequestParam("price") Long price, @RequestParam("amount") Integer amount, 
 			@RequestParam("describe") String describe, @RequestParam("photo") CommonsMultipartFile photo, 
 			HttpServletRequest request) throws Exception {
+		model.addAttribute("categorys", getCategory());
+		if(batchName.trim().length()==0||price==null||amount==null) {
+			model.addAttribute("status_add_batch",4);
+			return "admin/add_batch";
+		}
+		boolean check_name = check_nameBatch((ArrayList<Batch>)getListProduct(), batchName);
+		if(check_name==false) {
+			model.addAttribute("status_add_batch",3);
+			return "admin/add_batch";
+		}
+		
+		
 		HttpSession web_session = request.getSession();
 		Session session = factory.openSession();
 		Transaction transaction = session.beginTransaction();
@@ -64,6 +78,7 @@ public class Product_Ad {
 		batch.setDiscount(0);
 		batch.setDescribe(describe);
 		ServletContext context = web_session.getServletContext();  
+		
 	    String path = context.getRealPath("/resources/upload/product"); 
 	    String fileName = photo.getOriginalFilename();
 		if(photo.getContentType().equalsIgnoreCase("image/jpeg")||photo.getContentType().equalsIgnoreCase("image/png")) {
@@ -83,13 +98,13 @@ public class Product_Ad {
 			}catch (Exception e) {
 				transaction.rollback();
 				// TODO: handle exception
-				web_session.setAttribute("status_add_batch", 0);
+				model.addAttribute("status_add_batch", 0);
 				return "admin/add_batch";
 			}finally {
 				session.close();
 			}
 		}else {
-			web_session.setAttribute("status_add_batch", 2);
+			model.addAttribute("status_add_batch", 2);
 			return "admin/add_batch";
 		}
 		return "redirect:/admin/listproduct.htm";
@@ -110,15 +125,30 @@ public class Product_Ad {
 		return "admin/edit_batch";
 	}
 	
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "editbatch/{batchId}", method = RequestMethod.POST)
 	public String editBatch(ModelMap model, @PathVariable("batchId") Integer batchId,
 			@RequestParam("batchName")String batchName, @RequestParam("category") Integer categoryId,
 			@RequestParam("photo") CommonsMultipartFile photo, @RequestParam("describe") String describe,
 			@RequestParam("discount") Integer discount, HttpServletRequest request) throws Exception {
+		
 		HttpSession web_session = request.getSession();
 		Session session = factory.openSession();
 		Transaction transaction = session.beginTransaction();
 		Batch batch = (Batch) session.get(Batch.class, batchId);
+		boolean check_batchName = check_nameBatch((ArrayList<Batch>)getListProduct(), batch, batchName);
+		if(batchName.trim().length()==0||discount==null) {
+			model.addAttribute("status_update_batch",3);
+			model.addAttribute("categorys", getCategory());
+			model.addAttribute("batch", (Batch) session.get(Batch.class, batchId));
+			return "admin/edit_batch";
+		}
+		if(check_batchName==false) {
+			model.addAttribute("status_update_batch",2);
+			model.addAttribute("categorys", getCategory());
+			model.addAttribute("batch", (Batch) session.get(Batch.class, batchId));
+			return "admin/edit_batch";
+		}
 		Category category = (Category) session.get(Category.class , categoryId);
 		batch.setBatchName(batchName);
 		batch.setCategory(category);
@@ -131,11 +161,11 @@ public class Product_Ad {
 			try {
 				session.update(batch);
 				transaction.commit();
-//				web_session.setAttribute("status_add_batch", 1);
+				model.addAttribute("status_update_batch", 1);
 			}catch (Exception e) {
 				transaction.rollback();
 				// TODO: handle exception
-//				web_session.setAttribute("status_add_batch", 0);
+				model.addAttribute("status_update_batch", 0);
 			}finally {
 				session.close();
 			}
@@ -146,19 +176,44 @@ public class Product_Ad {
 				try {
 					session.update(batch);
 					transaction.commit();
-//					web_session.setAttribute("status_add_batch", 1);
+					model.addAttribute("status_update_batch", 1);
 				}catch (Exception e) {
 					transaction.rollback();
 					// TODO: handle exception
-//					web_session.setAttribute("status_add_batch", 0);
+					model.addAttribute("status_update_batch", 0);
 				}finally {
 					session.close();
 				}
 			}else {
-//				web_session.setAttribute("status_add_batch", 2);
+				model.addAttribute("status_update_batch_photo", 0);
 			}
-		}
+		}	
+		model.addAttribute("categorys", getCategory());
+		model.addAttribute("batch", batch);
 		return "admin/edit_batch";
+	}
+	
+	private boolean check_nameBatch(ArrayList<Batch> list, String name) {
+		String urlNameBatch = batchNameToURL(name);
+		for(Batch batch: list)
+			if(batch.batchNameToURL().equals(urlNameBatch))
+				return false;
+		return true;
+	}
+	
+	private boolean check_nameBatch(ArrayList<Batch> list,Batch batchNow ,String name) {
+		String urlNameBatch = batchNameToURL(name);
+		for(Batch batch: list)
+			if(!batch.getBatchId().equals(batchNow.getBatchId())) {
+				if(batch.batchNameToURL().equals(urlNameBatch))
+					return false;
+			}
+		return true;
+	}
+	
+	private String batchNameToURL(String batchName) {
+		return batchName.toLowerCase().trim().replace(" - ", "-").
+				replace(" ", "-").replace("/", "-");
 	}
 	
 	@RequestMapping(value = "disablebatch/{batchId}")

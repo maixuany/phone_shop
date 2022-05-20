@@ -137,15 +137,21 @@
 
 		<div>
 			<c:choose>
-				<c:when test="${status_add_batch==0}">
-					<div class="alert alert-danger" role="alert">Thêm sản phẩm
-						thất bại</div>
-					${status_add_batch=null }
+				<c:when test="${status_update_batch==0}">
+					<div class="alert alert-danger" role="alert">Chỉnh sửa sản phẩm thất bại</div>
 				</c:when>
-				<c:when test="${status_add_batch==2}">
+				<c:when test="${status_update_batch==2}">
+					<div class="alert alert-warning" role="alert">Tên sản phẩm đã được đặt tên cho lô sản phẩm khác</div>
+				</c:when>
+				<c:when test="${status_update_batch==3}">
+					<div class="alert alert-warning" role="alert">Các trường sản phẩm không được trống</div>
+				</c:when>
+				<c:when test="${status_update_batch==1}">
+					<div class="alert alert-success" role="alert">Sửa thông tin thành công</div>
+				</c:when>
+				<c:when test="${status_update_batch_photo==0}">
 					<div class="alert alert-warning" role="alert">File không hợp
 						lệ</div>
-					${status_add_batch=null }
 				</c:when>
 				<c:otherwise>
 

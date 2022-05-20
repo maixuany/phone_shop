@@ -101,6 +101,18 @@
 					</div>
 					${status_add_batch=null }
 				</c:when>
+				<c:when test="${status_add_batch==4}">
+					<div class="alert alert-warning" role="alert">
+  						Các trường không được chừa trống
+					</div>
+					${status_add_batch=null }
+				</c:when>
+				<c:when test="${status_add_batch==3}">
+					<div class="alert alert-warning" role="alert">
+  						Tên sản phẩm đã được sử dụng cho lô sản phẩm khác
+					</div>
+					${status_add_batch=null }
+				</c:when>
 				<c:otherwise>
 					
 				</c:otherwise>

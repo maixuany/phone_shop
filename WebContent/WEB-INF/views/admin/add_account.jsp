@@ -126,6 +126,43 @@
 								<input class="form-control" placeholder="*************" id = "password" name="password" type="password" autofocus="">
 							</div>
 							
+							<div>
+								<c:choose>
+									<c:when test="${status_add_account_username==0}">
+										<div class="alert alert-warning" role="alert">Username không hợp lệ</div>
+									</c:when>
+									<c:when test="${status_add_account_username==2}">
+										<div class="alert alert-warning" role="alert">Username đã được sử dụng cho tài khoản khác</div>
+									</c:when>
+									<c:when test="${status_add_account_email==0}">
+										<div class="alert alert-warning" role="alert">Email không hợp lệ</div>
+									</c:when>
+									<c:when test="${status_add_account_email==2}">
+										<div class="alert alert-warning" role="alert">Email đã được sử dụng cho tài khoản khác</div>
+									</c:when>
+									<c:when test="${status_add_account_name==0}">
+										<div class="alert alert-warning" role="alert">Họ và tên không hợp lệ</div>
+									</c:when>
+									<c:when test="${status_add_account_phone==0}">
+										<div class="alert alert-warning" role="alert">Số điện thoại không hợp lệ</div>
+									</c:when>
+									<c:when test="${status_add_account_phone==2}">
+										<div class="alert alert-warning" role="alert">Số điện thoại đã được đăng kí</div>
+									</c:when>
+									<c:when test="${status_add_account_address==0}">
+										<div class="alert alert-warning" role="alert">Địa chỉ không hợp lệ</div>
+									</c:when>
+									<c:when test="${status_add_account_password==0}">
+										<div class="alert alert-warning" role="alert">Mật khẩu không hợp lệ</div>
+									</c:when>
+									
+						
+									<c:otherwise>
+
+									</c:otherwise>
+								</c:choose>
+							</div>
+							
 							<button type="submit" class="btn btn-primary">Thêm Tài Khoản</button>
 						</fieldset>
 					</form>
