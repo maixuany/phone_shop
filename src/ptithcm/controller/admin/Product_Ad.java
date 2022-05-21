@@ -96,6 +96,7 @@ public class Product_Ad {
 				transaction.commit();
 				web_session.setAttribute("status_add_batch", 1);
 			}catch (Exception e) {
+				System.out.println(e.toString());
 				transaction.rollback();
 				// TODO: handle exception
 				model.addAttribute("status_add_batch", 0);
@@ -113,15 +114,23 @@ public class Product_Ad {
 	@RequestMapping(value = "batch/{batchId}")
 	public String infoBatch(ModelMap model, @PathVariable("batchId") Integer batchId) {
 		Session session = factory.getCurrentSession();
-		model.addAttribute("batch", (Batch)session.get(Batch.class, batchId));
+		Batch batch = (Batch)session.get(Batch.class, batchId);
+		if(batch==null) {
+			return "redirect:/admin/listproduct.htm";
+		}
+		model.addAttribute("batch", batch);
 		return "admin/info_batch";
 	}
 	
 	@RequestMapping(value = "editbatch/{batchId}", method = RequestMethod.GET)
 	public String loadpage_editBatch(ModelMap model, @PathVariable("batchId") Integer batchId) {
 		Session session = factory.getCurrentSession();
+		Batch batch = (Batch)session.get(Batch.class, batchId);
+		if(batch==null) {
+			return "redirect:/admin/listproduct.htm";
+		}
 		model.addAttribute("categorys", getCategory());
-		model.addAttribute("batch", (Batch)session.get(Batch.class, batchId));
+		model.addAttribute("batch", batch);
 		return "admin/edit_batch";
 	}
 	

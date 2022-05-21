@@ -38,10 +38,10 @@
 	<!-- Kết nối CSDL -->
 	<bean id="dataSource" 
 	    	class="org.springframework.jdbc.datasource.DriverManagerDataSource"
-			p:driverClassName="org.mariadb.jdbc.Driver"
-			p:url="jdbc:mariadb://localhost:3306/phone_shop"
-			p:username="root"
-			p:password="Mike22-11">
+			p:driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"
+			p:url="jdbc:sqlserver://localhost:1433; Database=shop_phone"
+			p:username="sa"
+			p:password="sa">
 	</bean>
 	
 	<!-- Cấu hình Hibernate -->
