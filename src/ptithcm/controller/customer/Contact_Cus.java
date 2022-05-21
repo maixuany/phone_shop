@@ -29,13 +29,6 @@ import ptithcm.entity.Account;
 @Transactional
 public class Contact_Cus {
 	
-	private static final Pattern PASSWORD_PATTERN =
-            Pattern.compile("^" +
-                    //"(?=.*[@#$%^&+=])" +     // at least 1 special character
-                    "(?=\\S+$)" +            // no white spaces
-                    ".{6,}" +                // at least 4 characters
-                    "$");
-	
 	@Autowired
 	SessionFactory factory;
 	
@@ -192,11 +185,13 @@ public class Contact_Cus {
 	}
 	
 	private boolean validatePassWord(String password){
-        if(password.isEmpty()){
-            return false;
-        }else if(!PASSWORD_PATTERN.matcher(password).matches()){
+		if(password.isEmpty()){
             return false;
         }
+		String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,20}$";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(password);
+		if(matcher.matches()==false) return false;
         else {
             return true;
         }

@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,20 +24,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import ptithcm.bean.Mailer;
 import ptithcm.entity.*;
 
 @Controller
 @Transactional
 public class Login {
-	private static final Pattern PASSWORD_PATTERN =
-            Pattern.compile("^" +
-                    //"(?=.*[@#$%^&+=])" +     // at least 1 special character
-                    "(?=\\S+$)" +            // no white spaces
-                    ".{6,}" +                // at least 4 characters
-                    "$");
-	
 	@Autowired
 	SessionFactory factory;
+	
+	@Autowired
+	Mailer mailer;
 	
 	@RequestMapping(value = "dangnhap", method = RequestMethod.GET)
 	public String getpage_Login(ModelMap model) {
@@ -190,16 +188,115 @@ public class Login {
 		return "admin/forgot_password";
 	}
 	
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "quenmatkhau", method = RequestMethod.POST)
-	public String quenmatkhau(ModelMap model, HttpServletRequest request) {
-//		HttpSession session = request.getSession();
+	public String quenmatkhau(ModelMap model, HttpServletRequest request, @RequestParam("email")String email) {
+		Random rnd = new Random();
+		int number = rnd.nextInt(999999);
+		Session session = factory.openSession();
+		Transaction transaction = session.beginTransaction();
+		Recovery_Password recovery_Password = (Recovery_Password) session.get(Recovery_Password.class, email);
+		String hql = "FROM Account";
+		Query query = session.createQuery(hql);
+		List<Account> accounts = query.list();
+		HttpSession se = request.getSession();
+		boolean check = false;
+		for (Account e : accounts) {
+			if (e.getEmail().trim().equals(email)) {
+				check = true;
+			}
+		}
+		if(check==true) {
+			if(recovery_Password==null) {
+				try {
+					recovery_Password = new Recovery_Password();
+					recovery_Password.setEmail(email);
+					recovery_Password.setCode(String.format("%06d", number));
+					session.save(recovery_Password);
+					transaction.commit();
+					try {
+						mailer.send("apolophone2021@gmail.com", email, "forgotpassword", recovery_Password.getCode());
+//						model.addAttribute("Email", recovery_Password.getEmail());
+						se.setAttribute("Email", recovery_Password.getEmail());
+					} catch (Exception e) {
+						// TODO: handle exception
+						model.addAttribute("status_send_email", -1);
+						return "admin/forgot_password";
+					}
+				} catch (Exception e) {
+					// TODO: handle exception
+					transaction.rollback();
+				} finally {
+					session.close();
+				}
+			}else {
+				try {
+					recovery_Password.setCode(String.format("%06d", number));
+					session.update(recovery_Password);
+					transaction.commit();
+					try {
+						mailer.send("apolophone2021@gmail.com", email, "forgotpassword", recovery_Password.getCode());
+//						model.addAttribute("Email", recovery_Password.getEmail());
+						se.setAttribute("Email", recovery_Password.getEmail());
+					} catch (Exception e) {
+						// TODO: handle exception
+						model.addAttribute("status_send_email", -1);
+						return "user/forgotpasswd";
+					}
+				} catch (Exception e) {
+					// TODO: handle exception
+					transaction.rollback();
+				} finally {
+					session.close();
+				}
+			}
+		}else {
+			model.addAttribute("status_send_email", 0);
+			return "admin/forgot_password";
+		}
 		return "admin/submitCode";
 	}
 	
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "submitCode", method = RequestMethod.POST)
-	public String submitCode(ModelMap model, HttpServletRequest request) {
-//		HttpSession session = request.getSession();
+	public String submitCode(ModelMap model, HttpServletRequest request, @RequestParam("code")Integer code,
+			@RequestParam("password")String password) {
+		HttpSession se = request.getSession();
+		String email = (String)se.getAttribute("Email");
+		ArrayList<Account> listAccount = (ArrayList<Account>) getListAccount();
+		Session session = factory.openSession();
+		Transaction tr = session.beginTransaction();
+		Recovery_Password recovery_Password = (Recovery_Password) session.get(Recovery_Password.class, email);
+		System.out.println(recovery_Password.getCode());
+		Account account = findByEmail(listAccount, email);
+		if(code==null||recovery_Password.getCode().equals(String.valueOf(code))==false) {
+			model.addAttribute("status_code", 0);
+			return "admin/submitCode";
+		}
+		System.out.println(check_PassWord(password));
+		if(check_PassWord(password)==0) {
+			model.addAttribute("status_password", 0);
+			return "admin/submitCode";
+		}
+		if(String.valueOf(code).equals(recovery_Password.getCode())) {
+			try {
+				account.setPassword(getMd5(password));
+				session.update(account);
+				tr.commit();
+				se.setAttribute("Email", null);
+			}catch (Exception e) {
+				tr.rollback();
+				// TODO: handle exception
+			}finally {
+				session.close();
+			}
+		}
 		return "redirect:/dangnhap.htm";
+	}
+	
+	private Account findByEmail(ArrayList<Account> list, String email) {
+		for(Account account: list) if(account.getEmail().equals(email)) return account;
+		return null;
 	}
 	
 	private int check_Name(String name) {
@@ -235,11 +332,13 @@ public class Login {
 	}
 	
 	private int check_PassWord(String password){
-        if(password.isEmpty()){
-            return 0;
-        }else if(!PASSWORD_PATTERN.matcher(password).matches()){
+		if(password.isEmpty()){
             return 0;
         }
+		String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,20}$";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(password);
+		if(matcher.matches()==false) return 0;
         else {
             return 1;
         }

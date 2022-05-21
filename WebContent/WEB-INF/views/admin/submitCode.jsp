@@ -36,13 +36,25 @@
 		<div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2 col-md-4 col-md-offset-4">
 			<div class="login-panel panel panel-default">
 				<div class="panel-heading">Forgot Password</div>
+				
+				<div>
+				<c:choose>
+				<c:when test="${status_code==0}">
+					<div class="alert alert-danger" role="alert">Code không hợp lệ</div>
+				</c:when>
+				<c:when test="${status_password==0}">
+					<div class="alert alert-warning" role="alert">Mật khẩu không hợp lệ</div>
+				</c:when>
+				
+				<c:otherwise>
+
+				</c:otherwise>
+				</c:choose>
+				</div>
+				
 				<div class="panel-body">
 					<form role="form" action="${pageContext.servletContext.contextPath}/submitCode.htm" method="post">
 						<fieldset>
-							<div class="form-group">
-							<p>Email</p>
-								<input disabled="disabled" class="form-control" placeholder="nguyenvana@gmail.com" id = "email" name="email" type="email" autofocus="">
-							</div>
 							
 							<div class="form-group">
 							<p>Code</p>

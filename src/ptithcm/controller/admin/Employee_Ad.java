@@ -31,13 +31,6 @@ import ptithcm.entity.Role;
 @RequestMapping(value = "admin")
 public class Employee_Ad {
 	
-	private static final Pattern PASSWORD_PATTERN =
-            Pattern.compile("^" +
-                    //"(?=.*[@#$%^&+=])" +     // at least 1 special character
-                    "(?=\\S+$)" +            // no white spaces
-                    ".{6,}" +                // at least 4 characters
-                    "$");
-	
 	@Autowired
 	SessionFactory factory;
 	
@@ -311,9 +304,11 @@ public class Employee_Ad {
 	private int check_password(String password) {
 		if(password.isEmpty()){
             return 0;
-        }else if(!PASSWORD_PATTERN.matcher(password).matches()){
-            return 0;
         }
+		String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,20}$";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(password);
+		if(matcher.matches()==false) return 0;
         else {
             return 1;
         }
