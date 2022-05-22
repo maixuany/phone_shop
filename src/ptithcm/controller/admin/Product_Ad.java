@@ -2,6 +2,7 @@ package ptithcm.controller.admin;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -163,12 +164,19 @@ public class Product_Ad {
 		batch.setCategory(category);
 		batch.setDescribe(describe);
 		batch.setDiscount(discount);
+		ArrayList<Product> listProduct = new ArrayList<Product>(batch.getProducts());
 		String fileName = photo.getOriginalFilename();
 		ServletContext context = web_session.getServletContext();
 		String path = context.getRealPath("/resources/upload/product"); 
 		if(fileName.equals("")) {
 			try {
 				session.update(batch);
+				for(Product product: listProduct) {
+					if(product.getStatus()==1) {
+						product.setPrice(batch.priceDiscount());
+						session.update(product);
+					}
+				}
 				transaction.commit();
 				model.addAttribute("status_update_batch", 1);
 			}catch (Exception e) {

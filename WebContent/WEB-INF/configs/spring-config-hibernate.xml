@@ -39,9 +39,9 @@
 	<bean id="dataSource" 
 	    	class="org.springframework.jdbc.datasource.DriverManagerDataSource"
 			p:driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"
-			p:url="jdbc:sqlserver://localhost:1433; Database=shop_phone"
+			p:url="jdbc:sqlserver://103.176.250.6:1433; Database=shop_phone"
 			p:username="sa"
-			p:password="sa">
+			p:password="Maixuany22-11">
 	</bean>
 	
 	<!-- Cấu hình Hibernate -->
