@@ -2,7 +2,6 @@ package ptithcm.controller.admin;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -238,7 +237,7 @@ public class Product_Ad {
 		Session session = factory.openSession();
 		Transaction transaction = session.beginTransaction();
 		Batch batch = (Batch) session.get(Batch.class, batchId);
-		batch.setStatus(2);
+		batch.setStatus(0);
 		try {
 			session.update(batch);
 			transaction.commit();
