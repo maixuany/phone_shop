@@ -126,6 +126,24 @@
 								</tbody>
 							</table>
 							
+							<div>
+						  <c:choose>
+								<c:when test="${status_error==0}">
+									<div class="alert alert-warning" role="alert">${name_batch } Ngừng kinh doanh</div>
+										${status_error=null }
+										${name_batch=null }
+								</c:when>
+								<c:when test="${status_error==2}">
+									<div class="alert alert-warning" role="alert">${name_batch } Hết hàng</div>
+										${status_error=null }
+										${name_batch=null }
+								</c:when>
+								<c:otherwise>
+
+								</c:otherwise>
+						</c:choose>
+						  </div>
+							
 					</div>
 						  </c:if>
 						  <div class="panel-heading">

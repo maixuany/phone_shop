@@ -1,5 +1,6 @@
 package ptithcm.controller.customer;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -171,6 +172,14 @@ public class Cart_Cus {
 		if(accountId==null) return "redirect:/trangchu.htm";
 		if(getAccount(accountId).getCarts().size()==0) {
 			return "redirect:/trangchu.htm";
+		}
+		List<Cart> listCart  =  (List<Cart>) getAccount(accountId).getCarts();
+		for(Cart cart: listCart) {
+			if(cart.getBatch().getStatus()==2) {
+				session.setAttribute("name_batch", cart.getBatch().getBatchName());
+				session.setAttribute("status_error",cart.getBatch().getStatus());
+				return "redirect:/user/mycart.htm";
+			}
 		}
 		model.addAttribute("paymentMethods", getListPayment());
 		model.addAttribute("listCarts",getAccount(accountId).getCarts());
